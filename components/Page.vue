@@ -1,0 +1,13 @@
+<template>
+	<ion-page>
+		<ion-content>
+			<ion-grid>
+				<ion-row>
+					<ion-col>
+						<slot></slot>
+					</ion-col>
+				</ion-row>
+			</ion-grid>
+		</ion-content>
+	</ion-page>
+</template>
