@@ -18,7 +18,7 @@ const musclesListDefault = [
 // 		{ days: [], setsPerDay: '0', index: index }
 // 	])
 // )
-const musclesDefault = Object.fromEntries({
+const musclesDefault = {
 	'Front Delts': {
 		days: ['Monday', 'Thursday', 'Saturday'],
 		setsPerDay: '4',
@@ -67,7 +67,7 @@ const musclesDefault = Object.fromEntries({
 	Jump: { days: ['Tuesday', 'Friday'], setsPerDay: '5', index: 15 },
 	'Up Chest': { days: ['Tuesday', 'Friday'], setsPerDay: '4', index: 7 },
 	Neck: { days: ['Friday'], setsPerDay: '3', index: 14 }
-})
+}
 
 const muscles = reactive(storage.getStorageSync('muscles') || musclesDefault)
 console.log('muscles', toRaw(muscles))
