@@ -9,15 +9,9 @@ const pages = [
 		path: '/groups'
 	}
 ]
-
-provide('pages', pages)
+const title = 'Gym Tool'
 </script>
 
 <template>
-	<ion-app>
-		<Header title="Gym Tool" :pages="pages" />
-		<ion-content>
-			<ion-router-outlet></ion-router-outlet>
-		</ion-content>
-	</ion-app>
+	<AppStart :title="title" :pages="pages" />
 </template>

@@ -1,44 +1,57 @@
 <script setup>
+import { useRoute } from 'vue-router'
+
 const props = defineProps({
 	title: {
 		type: String,
 		required: true
 	},
-	subtitle: {
-		type: String,
-		default: ''
-	},
 	pages: {
 		type: Array
+	},
+	titleStyle: {
+		type: String,
+		default: 'font-size: 2rem'
+	},
+	subtitleStyle: {
+		type: String,
+		default: 'font-size: 1.3rem'
+	},
+	buttonStyle: {
+		type: String,
+		default: ''
 	}
 })
 const router = useIonRouter()
+const vueRoute = useRoute()
 
-const subtitle = ref(props.subtitle)
-
-const onNavClick = (page, newSubtitle) => {
-	router.push(page)
-	subtitle.value = newSubtitle
-}
+const subtitle = computed(() => {
+	const page = props.pages.find(p => p.path === vueRoute.path)
+	return page ? page.name : ''
+})
 </script>
 
 <template>
 	<ion-header>
 		<ion-toolbar>
-			<ion-title size="large">{{ title }}</ion-title>
+			<ion-title :style="titleStyle" size="large">{{ title }}</ion-title>
 			<ion-buttons slot="secondary">
 				<ion-back-button></ion-back-button>
 				<ion-button
 					v-for="page in pages"
-					@click="onNavClick(page.path, page.name)"
+					:style="buttonStyle"
+					@click="router.push(page.path)"
 					>{{ page.name }}</ion-button
 				>
 			</ion-buttons>
 		</ion-toolbar>
 		<ion-toolbar v-if="subtitle">
-			<ion-title size="large" class="ion-text-center">{{
-				subtitle
-			}}</ion-title>
+			<ion-title
+				:style="subtitleStyle"
+				size="large"
+				class="ion-text-center"
+				>{{ subtitle }}</ion-title
+			>
 		</ion-toolbar>
 	</ion-header>
 </template>
@@ -47,10 +60,5 @@ const onNavClick = (page, newSubtitle) => {
 /* bold title */
 ion-title {
 	font-weight: bold !important;
-	font-size: 2rem;
-}
-
-ion-button {
-	font-size: 1.5rem;
 }
 </style>
