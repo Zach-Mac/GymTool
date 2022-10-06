@@ -45,14 +45,14 @@ const subtitle = computed(() => {
 				>
 			</ion-buttons>
 		</ion-toolbar>
-		<ion-toolbar v-if="subtitle">
+		<!-- <ion-toolbar v-if="subtitle">
 			<ion-title
 				:style="subtitleStyle"
 				size="large"
 				class="ion-text-center"
 				>{{ subtitle }}</ion-title
 			>
-		</ion-toolbar>
+		</ion-toolbar> -->
 	</ion-header>
 </template>
 
