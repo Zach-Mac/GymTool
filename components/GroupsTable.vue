@@ -15,7 +15,7 @@ const props = defineProps({
 	}
 })
 
-console.log('load table', props.loaded)
+console.log('load table', props.loaded, 'user', user.value)
 
 const loaded = computed(() => props.loaded)
 
