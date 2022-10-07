@@ -25,10 +25,12 @@ onMounted(async () => {
 		console.error('error', error)
 
 		muscles.value = musclesDefault
-	} else {
+	} else if (data.length && data[0].data) {
 		console.log('data', data[0].data)
 		supabaseGetError.value = GOOD
 		muscles.value = data[0].data
+	} else {
+		muscles.value = musclesDefault
 	}
 
 	loaded.value = true
