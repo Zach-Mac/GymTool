@@ -11,7 +11,8 @@ const user = useSupabaseUser()
 		<ion-content>
 			<ion-row v-if="!user">
 				<ion-col class="ion-text-center">
-					<Auth />
+					<!-- <AuthMagicLink /> -->
+					<AuthGoogle />
 				</ion-col>
 			</ion-row>
 			<ion-row
