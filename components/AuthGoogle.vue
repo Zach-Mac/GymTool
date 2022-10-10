@@ -6,6 +6,7 @@ const done = ref(false)
 
 const handleLogin = async () => {
 	try {
+		console.log('Attempting to log in with Google')
 		loading.value = true
 		const { error } = await supabase.auth.signIn(
 			{ provider: 'google' },
@@ -14,20 +15,19 @@ const handleLogin = async () => {
 		if (error) throw error
 		done.value = true
 	} catch (error) {
+		console.log('Error logging in with Google', error)
 		alert(error.error_description || error.message)
 	} finally {
+		console.log('Finally logging in with Google')
 		loading.value = false
 	}
 }
 </script>
 
 <template>
-	<form @submit.prevent="handleLogin">
-		<h1 class="header">Please sign in to use Gym Tool</h1>
-		<ion-button :disabled="loading">
-			{{ loading ? 'Loading' : 'Sign in with google' }}
-		</ion-button>
-	</form>
+	<ion-button @click="handleLogin" :disabled="loading">
+		{{ loading ? 'Loading' : 'Sign in with google' }}
+	</ion-button>
 	<!-- <ion-toast
 		:isOpen="done"
 		@idDismiss="() => (done = false)"

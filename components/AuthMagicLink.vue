@@ -21,7 +21,6 @@ const handleLogin = async () => {
 
 <template>
 	<form @submit.prevent="handleLogin">
-		<h1 class="header">Please sign in to use Gym Tool</h1>
 		<p class="description">Sign in via magic link with your email below</p>
 		<ion-item fill="outline">
 			<ion-label position="floating">Email</ion-label>
