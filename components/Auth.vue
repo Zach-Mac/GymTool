@@ -33,7 +33,7 @@ const handleLogin = async () => {
 	</form>
 	<ion-toast
 		:isOpen="done"
-		@idDismiss="() => (done = false)"
+		@didDismiss="() => (done = false)"
 		message="Check your email for the login link!"
 		duration="2000"
 		position="middle"
