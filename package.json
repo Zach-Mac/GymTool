@@ -8,6 +8,9 @@
 	},
 	"devDependencies": {
 		"@nuxtjs/supabase": "^0.1.27",
+		"@vueuse/components": "^9.4.0",
+		"@vueuse/core": "^9.4.0",
+		"@vueuse/nuxt": "^9.4.0",
 		"nuxt": "rc",
 		"nuxt-ionic": "^0.7.0"
 	},
