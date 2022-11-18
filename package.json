@@ -7,16 +7,18 @@
 		"preview": "nuxt preview"
 	},
 	"devDependencies": {
+		"@kevinmarrec/nuxt-pwa": "^0.11.1",
+		"@nuxtjs/ionic": "^0.8.0",
 		"@nuxtjs/supabase": "^0.1.27",
 		"@vueuse/components": "^9.4.0",
 		"@vueuse/core": "^9.4.0",
 		"@vueuse/nuxt": "^9.4.0",
-		"nuxt": "rc",
-		"nuxt-ionic": "^0.7.0"
+		"nuxt": "^3.0.0"
 	},
 	"dependencies": {
 		"@ionic/core": "^6.3.0",
 		"@ionic/vue": "^6.3.0",
+		"vue-auth-ui": "^0.1.1",
 		"vuedraggable": "^4.1.0"
 	}
 }
