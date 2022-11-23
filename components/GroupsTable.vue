@@ -8,15 +8,8 @@ const props = defineProps({
 	muscles: {
 		type: Object,
 		required: true
-	},
-	loaded: {
-		type: Boolean,
-		required: true
 	}
 })
-console.log('load table', props.loaded, 'user', user.value)
-
-const loaded = computed(() => props.loaded)
 
 const muscles = reactive(props.muscles)
 // update db on change
@@ -109,7 +102,7 @@ const mondayStyle = day =>
 const table = ref(null)
 const { width: tableWidth, height: tableHeight } = useElementSize(table)
 const { width: winWidth, height: winHeight } = useWindowSize()
-useLog('winwidth, tableWidth', winWidth, tableWidth)
+// useLog('winwidth, tableWidth', winWidth, tableWidth)
 
 const SHRINK_ORDER = ['DAY', ['SD', 'SW'], 'MUSCLE', 'G']
 const MAX_SHRINKAGE = SHRINK_ORDER.flat().length
@@ -122,34 +115,50 @@ const SHRINK = Object.freeze(
 	)
 )
 const shrinkage = ref(0)
+const { key, update } = useKey()
 
 const lastWinWidthTableChange = ref(0)
-watch([winWidth, tableWidth], () => {
-	if (winWidth.value < tableWidth.value + 5) {
-		// shorten table
-		// if not max level, increase level
-		console.log('shorten table')
-		if (shrinkage.value < MAX_SHRINKAGE) {
-			shrinkage.value++
-		}
-		lastWinWidthTableChange.value = winWidth.value
-	} else {
-		// lengthen table
-		// if not winWidth == lastWinWidthTableChange, decrease level
-		console.log('lengthen table')
-		if (winWidth.value != lastWinWidthTableChange.value) {
-			if (shrinkage.value > 0) {
-				shrinkage.value--
+watchThrottled(
+	[winWidth, tableWidth],
+	() => {
+		console.log('asdfasdf', shrinkage.value)
+		if (winWidth.value < tableWidth.value + 5) {
+			// shorten table
+			// if not max level, increase level
+			console.log('shorten table', winWidth.value, tableWidth.value + 5)
+			if (shrinkage.value < MAX_SHRINKAGE) {
+				shrinkage.value++
+				update()
+			}
+			lastWinWidthTableChange.value = winWidth.value
+			console.log('222222222', shrinkage.value)
+		} else {
+			// lengthen table
+			// if not winWidth == lastWinWidthTableChange, decrease level
+			if (winWidth.value != lastWinWidthTableChange.value) {
+				if (shrinkage.value > 0) {
+					console.log(
+						'lengthen table',
+						winWidth.value,
+						tableWidth.value + 5
+					)
+					shrinkage.value--
+					update()
+				}
 			}
 		}
-	}
-})
+	},
+	{ immediate: true, throttle: 100 }
+)
 
-const daysLabel = day => (shrinkage.value >= SHRINK.DAY ? day[0] : day)
+const daysLabel = day =>
+	computed(() => (shrinkage.value >= SHRINK.DAY ? day[0] : day)).value
 const muscleLabel = m =>
-	shrinkage.value >= SHRINK.MUSCLE
-		? m.split(' ').reduce((prev, curr) => prev + curr[0], '')
-		: m
+	computed(() =>
+		shrinkage.value >= SHRINK.MUSCLE
+			? m.split(' ').reduce((prev, curr) => prev + curr[0], '')
+			: m
+	).value
 const setsPerDayLabel = computed(() =>
 	shrinkage.value >= SHRINK.SD ? 'S/D' : 'Sets/Day'
 )
@@ -161,7 +170,7 @@ const groupLabel = computed(() => (shrinkage.value >= SHRINK.G ? 'G' : 'Group'))
 
 <template>
 	<div style="overflow-x: auto">
-		<table v-if="loaded" ref="table">
+		<table ref="table" v-auto-animate :key="key">
 			<tr>
 				<th v-for="day in DAYS_OF_WEEK" :style="mondayStyle(day)">
 					{{ daysLabel(day) }}
@@ -283,67 +292,21 @@ td {
 	border-top: none;
 	border-bottom: none;
 }
+
 .sdInput {
 	--padding-start: 0px;
 	padding-right: 0px;
 	--inner-padding-end: 0px;
 	text-align: center;
-	--keyboard-offset: 0px;
-	--overflow: auto;
-	--offset-top: 0px;
-	--offset-bottom: 0px;
-	border-collapse: collapse;
-	border-spacing: 0;
-	--border-radius: 0px;
-	--border-style: solid;
-	--padding-top: 0px;
-	--padding-bottom: 0px;
-	--padding-end: 0px;
-	--inner-padding-top: 0px;
-	--inner-padding-bottom: 0px;
-	--inner-padding-start: 0px;
-	--inner-box-shadow: none;
-	--detail-icon-color: initial;
-	--detail-icon-font-size: 20px;
-	--detail-icon-opacity: 0.25;
-	--color-activated: var(--color);
-	--color-focused: var(--color);
-	--color-hover: var(--color);
-	-webkit-font-smoothing: antialiased;
-	display: block;
-	position: relative;
-	justify-content: space-between;
-	outline: none;
-	color: var(--color);
-	font-family: var(--ion-font-family, inherit);
-	text-decoration: none;
-	--min-height: 48px;
-	--background: var(--ion-item-background, var(--ion-background-color, #fff));
-	--background-activated: transparent;
-	--background-activated-opacity: 0;
-	--background-focused-opacity: 0.12;
-	--background-hover-opacity: 0.04;
-	--color: var(--ion-item-color, var(--ion-text-color, #000));
-	--transition: opacity 15ms linear, background-color 15ms linear;
-	--highlight-color-focused: var(--ion-color-primary, #3880ff);
-	--highlight-color-valid: var(--ion-color-success, #2dd36f);
-	--highlight-color-invalid: var(--ion-color-danger, #eb445a);
-	font-size: 16px;
-	font-weight: normal;
-	text-transform: none;
-	align-items: center;
-	--highlight-height: 2px;
-	--inner-border-width: 0;
-	--show-full-highlight: 1;
-	--show-inset-highlight: 0;
-	--ripple-color: transparent;
-	--background-focused: transparent;
-	--background-hover: transparent;
-	--border-color: var(--ion-color-step-500, gray);
-	--border-width: 1px;
-	border: none;
-	overflow: visible;
-	box-sizing: border-box;
-	-webkit-tap-highlight-color: transparent;
+}
+</style>
+
+<style>
+/* ionic input classes */
+.item-inner {
+	padding: 0 !important;
+}
+.item-native {
+	padding: 0 !important;
 }
 </style>

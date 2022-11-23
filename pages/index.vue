@@ -13,6 +13,7 @@ const allPages = inject('pages')
 
 const pages = allPages.slice(1)
 
+const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
 const appearance = {
@@ -29,8 +30,6 @@ const appearance = {
 		}
 	}
 }
-
-const supabase = useSupabaseClient()
 
 const loading = ref(false)
 const done = ref(false)

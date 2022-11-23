@@ -4,6 +4,12 @@ import { onMounted } from 'vue'
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
+const router = useIonRouter()
+
+if (!user.value) {
+	router.push('/')
+}
+
 const GOOD = 'good'
 
 const supabaseGetError = ref(null)
@@ -52,6 +58,6 @@ onMounted(async () => {
 			position="middle"
 		/>
 		<ion-loading :isOpen="!loaded" message="Loading..." />
-		<GroupsTable :muscles="muscles" :loaded="loaded" :key="loaded" />
+		<GroupsTable v-if="loaded" :muscles="muscles" />
 	</Page>
 </template>
