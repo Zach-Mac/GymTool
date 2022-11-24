@@ -12,8 +12,10 @@ const props = defineProps({
 })
 
 const muscles = reactive(props.muscles)
-// update db on change
-watch(muscles, async () => {
+
+const saveToast = ref(false)
+const saveErrorToast = ref(null)
+async function updateDB() {
 	const { data, error } = await supabase
 		.from('muscle_group_schedules')
 		.upsert({
@@ -22,11 +24,17 @@ watch(muscles, async () => {
 			name: 'testname'
 		})
 	if (error) {
+		saveErrorToast.value = true
 		console.log('supabase post error', error)
 	} else {
+		saveToast.value = true
 		console.log('supabase post data', data)
 	}
-})
+}
+
+// watch(muscles, async () => {
+// 	updateDB()
+// })
 
 let mL = new Array(Object.keys(muscles).length)
 for (let name of Object.keys(muscles)) {
@@ -251,6 +259,21 @@ const groupLabel = computed(() => (shrinkage.value >= SHRINK.G ? 'G' : 'Group'))
 			</tr>
 		</table>
 	</div>
+	<ion-button @click="updateDB()"> Save </ion-button>
+	<ion-toast
+		:isOpen="saveToast"
+		@didDismiss="() => (saveToast = false)"
+		message="Saved!"
+		duration="1000"
+		position="middle"
+	/>
+	<ion-toast
+		:isOpen="saveErrorToast"
+		@didDismiss="() => (saveErrorToast = false)"
+		message="Error saving. Please try again"
+		duration="1000"
+		position="middle"
+	/>
 </template>
 
 <style scoped>
@@ -294,7 +317,7 @@ td {
 }
 
 .sdInput {
-	--padding-start: 0px;
+	--padding-start: 0px !important;
 	padding-right: 0px;
 	--inner-padding-end: 0px;
 	text-align: center;
@@ -308,5 +331,21 @@ td {
 }
 .item-native {
 	padding: 0 !important;
+}
+
+:root {
+	--native-padding-left: 0px !important;
+}
+
+:host(.item-fill-outline) .item-native {
+	--native-padding-left: 0px !important;
+	border-radius: 40px;
+}
+
+.item-native {
+	--native-padding-left: 0px !important;
+	padding-inline-start: 0px !important;
+	--padding-start: 0px !important;
+	border-radius: 4px;
 }
 </style>

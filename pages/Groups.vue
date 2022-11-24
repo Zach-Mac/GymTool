@@ -4,17 +4,18 @@ import { onMounted } from 'vue'
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-const router = useIonRouter()
-
-if (!user.value) {
-	router.push('/')
-}
-
 const GOOD = 'good'
 
 const supabaseGetError = ref(null)
 const muscles = ref(EMPTY_MUSCLES)
 const loaded = ref(false)
+
+const router = useIonRouter()
+
+if (!user.value) {
+	router.push('/')
+	loaded.value = true
+}
 
 watch(muscles, () => {
 	console.log('muscles', muscles.value)
@@ -54,7 +55,7 @@ onMounted(async () => {
 		<ion-toast
 			:isOpen="supabaseGetError == GOOD"
 			message="Getting saved data from database"
-			duration="2000"
+			duration="1000"
 			position="middle"
 		/>
 		<ion-loading :isOpen="!loaded" message="Loading..." />
