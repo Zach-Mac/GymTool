@@ -19,15 +19,8 @@ const { history, undo, redo, canUndo, canRedo } = useRefHistory(muscles, {
 
 useEventListener(document, 'keydown', e => {
 	if (e.ctrlKey && e.key === 'z') {
-		console.log('undo')
 		undo()
-	}
-})
-
-useEventListener(document, 'keydown', e => {
-	console.log('e.key', e.key)
-	if (e.ctrlKey && e.key === 'y') {
-		console.log('redo')
+	} else if (e.ctrlKey && e.key === 'y') {
 		redo()
 	}
 })
