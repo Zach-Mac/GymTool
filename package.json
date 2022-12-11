@@ -19,6 +19,8 @@
 		"@formkit/auto-animate": "^1.0.0-beta.5",
 		"@ionic/core": "^6.3.0",
 		"@ionic/vue": "^6.3.0",
+		"lodash": "^4.17.21",
+		"lodash-es": "^4.17.21",
 		"vue-auth-ui": "^0.1.1",
 		"vuedraggable": "^4.1.0"
 	}

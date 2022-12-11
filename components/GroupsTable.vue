@@ -1,5 +1,6 @@
 <script setup>
 import draggable from 'vuedraggable'
+import { toastController } from '@ionic/vue'
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
@@ -11,7 +12,25 @@ const props = defineProps({
 	}
 })
 
-const muscles = reactive(props.muscles)
+const muscles = ref(props.muscles)
+const { history, undo, redo, canUndo, canRedo } = useRefHistory(muscles, {
+	deep: true
+})
+
+useEventListener(document, 'keydown', e => {
+	if (e.ctrlKey && e.key === 'z') {
+		console.log('undo')
+		undo()
+	}
+})
+
+useEventListener(document, 'keydown', e => {
+	console.log('e.key', e.key)
+	if (e.ctrlKey && e.key === 'y') {
+		console.log('redo')
+		redo()
+	}
+})
 
 const saveToast = ref(false)
 const saveErrorToast = ref(null)
@@ -20,7 +39,7 @@ async function updateDB() {
 		.from('muscle_group_schedules')
 		.upsert({
 			user_id: user.value.id,
-			data: muscles,
+			data: muscles.value,
 			name: 'testname'
 		})
 	if (error) {
@@ -32,19 +51,15 @@ async function updateDB() {
 	}
 }
 
-// watch(muscles, async () => {
-// 	updateDB()
-// })
-
-let mL = new Array(Object.keys(muscles).length)
-for (let name of Object.keys(muscles)) {
-	mL[muscles[name].index] = name
+let mL = new Array(Object.keys(muscles.value).length)
+for (let name of Object.keys(muscles.value)) {
+	mL[muscles.value[name].index] = name
 }
 
 const musclesList = ref(mL)
 watch(musclesList, () => {
 	for (let i = 0; i < musclesList.value.length; i++) {
-		muscles[musclesList.value[i]].index = i
+		muscles.value[musclesList.value[i]].index = i
 	}
 })
 
@@ -53,8 +68,9 @@ const musclesComputed = computed(() => {
 		musclesList.value.map(m => [
 			m,
 			{
-				setsPerWeek: parseInt(muscles[m].setsPerDay)
-					? parseInt(muscles[m].setsPerDay) * muscles[m].days.length
+				setsPerWeek: parseInt(muscles.value[m].setsPerDay)
+					? parseInt(muscles.value[m].setsPerDay) *
+					  muscles.value[m].days.length
 					: 0
 			}
 		])
@@ -64,41 +80,56 @@ const musclesComputed = computed(() => {
 
 const totalSetsPerDay = day => {
 	let total = 0
-	for (let m of Object.keys(muscles)) {
-		if (muscles[m].days.includes(day)) {
-			total += parseInt(muscles[m].setsPerDay)
+	for (let m of Object.keys(muscles.value)) {
+		if (muscles.value[m].days.includes(day)) {
+			total += parseInt(muscles.value[m].setsPerDay)
 		}
 	}
 	return total
 }
 
 const newMuscle = ref('')
-function addMuscle() {
+async function addMuscle() {
 	if (newMuscle.value) {
-		const newIndex = musclesList.value.length
-		muscles[newMuscle.value] = {
-			days: [],
-			setsPerDay: '0',
-			index: newIndex
+		if (!musclesList.value.includes(newMuscle.value)) {
+			const newIndex = musclesList.value.length
+			muscles.value[newMuscle.value] = {
+				days: [],
+				setsPerDay: '0',
+				index: newIndex
+			}
+			musclesList.value.push(newMuscle.value)
+			newMuscle.value = ''
+		} else {
+			const toast = await toastController.create({
+				message: newMuscle.value + ' already exists',
+				duration: 1000,
+				position: 'middle'
+			})
+
+			await toast.present()
+			console.log(newMuscle.value, 'already exists')
 		}
-		musclesList.value.push(newMuscle.value)
-		newMuscle.value = ''
 	}
 }
 function deleteMuscle(m) {
-	delete muscles[m]
+	delete muscles.value[m]
 	musclesList.value = musclesList.value.filter(muscle => muscle !== m)
 }
 
 function toggleDay(m, day) {
 	let index
-	if ((index = muscles[m].days.indexOf(day)) >= 0)
-		muscles[m].days.splice(index, 1)
-	else muscles[m].days.push(day)
+	if ((index = muscles.value[m].days.indexOf(day)) >= 0) {
+		muscles.value[m].days.splice(index, 1)
+	} else {
+		// console.log('muscles', muscles)
+		muscles.value[m].days.push(day)
+		// console.log('muscles', muscles)
+	}
 }
 
 function getDay(m, day) {
-	if (muscles[m].days.includes(day)) {
+	if (muscles.value[m].days.includes(day)) {
 		return m
 	}
 	return '-'
@@ -112,17 +143,12 @@ const { width: tableWidth, height: tableHeight } = useElementSize(table)
 const { width: winWidth, height: winHeight } = useWindowSize()
 // useLog('winwidth, tableWidth', winWidth, tableWidth)
 
-const SHRINK_ORDER = ['DAY', ['SD', 'SW'], 'MUSCLE', 'G']
-const MAX_SHRINKAGE = SHRINK_ORDER.flat().length
-// turn shrink order into object of index
-const SHRINK = Object.freeze(
-	Object.fromEntries(
-		SHRINK_ORDER.map((val, i) =>
-			Array.isArray(val) ? val.map((v, j) => [v, i + 1]) : [[val, i + 1]]
-		).flat()
-	)
-)
-const shrinkage = ref(0)
+const { shrinkage, SHRINK, MAX_SHRINKAGE } = useShrinkage([
+	'DAY',
+	['SD', 'SW'],
+	'MUSCLE',
+	'G'
+])
 const { key, update } = useKey()
 
 const lastWinWidthTableChange = ref(0)
@@ -178,6 +204,8 @@ const groupLabel = computed(() => (shrinkage.value >= SHRINK.G ? 'G' : 'Group'))
 
 <template>
 	<div style="overflow-x: auto">
+		<ion-button @click="undo" :disabled="!canUndo">undo</ion-button>
+		<ion-button @click="redo" :disabled="!canRedo">redo</ion-button>
 		<table ref="table" v-auto-animate :key="key">
 			<tr>
 				<th v-for="day in DAYS_OF_WEEK" :style="mondayStyle(day)">

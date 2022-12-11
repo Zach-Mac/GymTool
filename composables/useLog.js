@@ -1,30 +1,30 @@
-export default function (name, ...refs) {
-	const rawRefs = refs.map(ref => {
-		if (ref) return unref(ref)
-	})
-	console.log(name, ...rawRefs)
+export default function (...args) {
+	let refs = []
+	let reactives = []
+	let other = []
 
-	watch(refs, () => {
-		const rawRefs = refs.map(ref => {
-			if (ref) return unref(ref)
-		})
-		console.log(name, ...rawRefs)
+	args.forEach(arg => {
+		if (isRef(arg)) refs.push(arg)
+		else if (isReactive(arg)) reactives.push(arg)
+		else other.push(arg)
 	})
+
+	function logAll() {
+		console.log(
+			// other.toString(),
+			...other,
+			...refs.map(ref => unref(ref)),
+			...reactives.map(reactive => toRaw(reactive))
+		)
+	}
+
+	watch(
+		[...refs, ...reactives],
+		() => {
+			logAll()
+		},
+		{ immediate: true, deep: true }
+	)
+
+	return args[0]
 }
-
-// const refVar = useLog(ref('whatever'))
-// const refVar2 = useLog()
-//
-
-// function log(variable) {
-// 	console.log(JSON.stringify(variable))
-// }
-
-// export default log
-
-// console.log('-------------------------- TESTING LOG --------------------------')
-
-// const asdf = 10
-// const string2 = 'asdfstridfg'
-// // log(asdf, 12, 'string', asdf, string2)
-// log({ asdf, string2 })
