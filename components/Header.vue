@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { personCircle } from 'ionicons/icons'
 
 const props = defineProps({
 	title: {
@@ -23,20 +23,21 @@ const props = defineProps({
 	}
 })
 const router = useIonRouter()
-const vueRoute = useRoute()
-
-const subtitle = computed(() => {
-	const page = props.pages.find(p => p.path === vueRoute.path)
-	return page ? page.name : ''
-})
 </script>
 
 <template>
 	<ion-header>
-		<ion-toolbar>
+		<ion-toolbar align-title="center">
 			<ion-title :style="titleStyle" size="large">{{ title }}</ion-title>
-			<ion-buttons slot="secondary">
-				<ion-back-button></ion-back-button>
+			<ion-buttons slot="start">
+				<!-- <ion-back-button default-href="#"></ion-back-button> -->
+				<ion-menu-button auto-hide="false"></ion-menu-button>
+			</ion-buttons>
+			<ion-buttons slot="end">
+				<ion-button @click="router.push('/profile')">
+					<ion-icon slot="icon-only" :icon="personCircle"></ion-icon>
+				</ion-button>
+				<!-- TODO: if enough room -->
 				<ion-button
 					v-for="page in pages"
 					:style="buttonStyle"

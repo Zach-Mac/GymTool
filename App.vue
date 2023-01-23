@@ -7,6 +7,10 @@ const pages = [
 	{
 		name: 'Muscle Groups',
 		path: '/groups'
+	},
+	{
+		name: 'Calendar Tool',
+		path: '/calendar'
 	}
 ]
 const title = 'Gym Tool'

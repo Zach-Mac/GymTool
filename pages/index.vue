@@ -40,7 +40,10 @@ const handleLogin = async provider => {
 		loading.value = true
 		const { error } = await supabase.auth.signIn(
 			{ provider: provider.provider },
-			{ redirectTo: window.location.origin }
+			{
+				redirectTo: window.location.origin,
+				scopes: 'https://www.googleapis.com/auth/calendar'
+			}
 		)
 		if (error) throw error
 		done.value = true
